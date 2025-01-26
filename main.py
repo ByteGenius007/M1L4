@@ -51,6 +51,20 @@ def attack_pok(message):
     else:
         bot.send_message(message.chat.id, "Чтобы атаковать, нужно ответить на сообщения того, кого хочешь атаковать")
 
+@bot.message_handler(commands=['info'])
+def info(message):
+    username = message.from_user.username  # Получаем имя пользователя
+
+    if username in Pokemon.pokemons.keys():  # Проверяем, есть ли покемон у пользователя
+        pok = Pokemon.pokemons[username]  # Получаем покемона из словаря
+        bot.send_message(
+            message.chat.id,
+            f"Информация о твоем покемоне:\n{pok.info()}"
+        )
+        bot.send_photo(message.chat.id, pok.show_img())  # Отправляем изображение покемона
+    else:
+        bot.send_message(message.chat.id, "Ты еще не создал покемона. Используй команду /go")
+
 
 
 bot.infinity_polling(none_stop=True)
