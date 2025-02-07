@@ -1,4 +1,5 @@
 from random import randint
+from datetime import datetime, timedelta
 import requests
 
 class Pokemon:
@@ -18,6 +19,7 @@ class Pokemon:
         self.hp = self.get_hp()
         self.attack_power = self.get_attack()
         self.level = 1
+        self.last_feed_time = datetime.now()
         
         Pokemon.pokemons[pokemon_trainer] = self
 
@@ -65,7 +67,7 @@ class Pokemon:
         """Увеличивает уровень покемона"""
         self.level += 1
         self.hp += 5
-        self.attack += 3
+        self.attack_power += 3
 
     def attack(self, enemy):
         """Атака покемона в зависимости от его типа"""
@@ -103,6 +105,18 @@ class Pokemon:
         self.attack_power -= super_boost
         return result + f"\nБоец применил супер-атаку силой: {super_boost}"
 
+    def feed(self, feed_interval=20, hp_increase=10):
+        current_time = datetime.now()
+        delta_time = timedelta(seconds=feed_interval)
+        
+        if (current_time - self.last_feed_time) >= delta_time:
+            self.hp += hp_increase
+            self.last_feed_time = current_time
+            return f"Здоровье покемона увеличено. Текущее здоровье: {self.hp}"
+        else:
+            next_feed_time = self.last_feed_time + delta_time
+            return f"Следующее время кормления покемона: {next_feed_time.strftime('%H:%M:%S')}"
+    
     # Метод класса для получения информации
     def info(self):
         return (f"Имя твоего покемона: {self.name}\n"
@@ -121,6 +135,9 @@ class Wizard(Pokemon):
         super().__init__(pokemon_trainer)
         self.magic_power = randint(15, 25)  # Магическая сила
 
+    def feed(self, feed_interval=10, hp_increase=10):  # Уменьшен интервал кормления
+        return super().feed(feed_interval, hp_increase)
+
     def attack(self, enemy):
         total_damage = self.attack_power + self.magic_power
         if enemy.hp > total_damage:
@@ -137,6 +154,9 @@ class Fighter(Pokemon):
         super().__init__(pokemon_trainer)
         self.critical_chance = randint(1, 5)  # Шанс критического удара (20%)
 
+    def feed(self, feed_interval=20, hp_increase=20):  # Увеличено восстановление HP
+        return super().feed(feed_interval, hp_increase)
+    
     def attack(self, enemy):
         super_boost = randint(5, 15)
         self.attack_power += super_boost

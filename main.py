@@ -3,7 +3,8 @@ from config import token
 
 from logic import Pokemon
 
-bot = telebot.TeleBot(token) 
+
+bot = telebot.TeleBot(token)
 
 @bot.message_handler(commands=['go'])
 def go(message):
@@ -51,6 +52,16 @@ def attack_pok(message):
     else:
         bot.send_message(message.chat.id, "Чтобы атаковать, нужно ответить на сообщения того, кого хочешь атаковать")
 
+@bot.message_handler(commands=['feed'])
+def feed_pokemon(message):
+    username = message.from_user.username
+    if username in Pokemon.pokemons.keys():
+        pok = Pokemon.pokemons[username]
+        result = pok.feed()
+        bot.send_message(message.chat.id, result)
+    else:
+        bot.send_message(message.chat.id, "Сначала создай покемона командой /go")
+
 @bot.message_handler(commands=['info'])
 def info(message):
     username = message.from_user.username  # Получаем имя пользователя
@@ -67,5 +78,5 @@ def info(message):
 
 
 
-bot.infinity_polling(none_stop=True)
-
+#bot.infinity_polling(none_stop=True)
+bot.infinity_polling(interval=3, timeout=20)
